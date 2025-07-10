@@ -1,36 +1,51 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isCustomer, setIsCustomer] = useState(false);
+  const [user, setUser] = useState(null); // Store user object
+  const [token, setToken] = useState(null);
+  const [logoutSuccess, setLogoutSuccess] = useState(false);
 
-  // Admin dummy login
-  const loginAsAdmin = (username, password) => {
-    if (username === "admin" && password === "admin123") {
-      setIsAdmin(true);
-      return true;
-    }
-    return false;
+  // Real login for customer
+  const loginCustomer = (userData, jwtToken) => {
+    setUser(userData);
+    setToken(jwtToken);
+    localStorage.setItem("customerUser", JSON.stringify(userData));
+    localStorage.setItem("customerToken", jwtToken);
   };
 
-  // Customer dummy login
-  const loginAsCustomer = (username, password) => {
-    if (username === "customer" && password === "cust123") {
-      setIsCustomer(true);
-      return true;
-    }
-    return false;
-  };
-
+  // Real logout
   const logout = () => {
-    setIsAdmin(false);
-    setIsCustomer(false);
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem("customerUser");
+    localStorage.removeItem("customerToken");
+    setLogoutSuccess(true);
   };
+
+  // On mount, restore from localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem("customerUser");
+    const storedToken = localStorage.getItem("customerToken");
+    if (storedUser && storedToken) {
+      setUser(JSON.parse(storedUser));
+      setToken(storedToken);
+    }
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ isAdmin, isCustomer, loginAsAdmin, loginAsCustomer, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isCustomer: !!user,
+        loginCustomer,
+        logout,
+        logoutSuccess,
+        setLogoutSuccess,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
