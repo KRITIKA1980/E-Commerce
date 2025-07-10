@@ -586,7 +586,7 @@ const CustomerLogin = () => {
             </button>
 
             {/* Sign Up Link */}
-            <div className="text-center text-sm text-gray-500">
+            <div className="text-center text-sm text-gray-600">
               Don't have an account?{" "}
               <Link to="/register" className="text-orange-500 hover:text-orange-600 font-medium underline">
                 Create one here
@@ -600,3 +600,4 @@ const CustomerLogin = () => {
 }
 
 export default CustomerLogin
+  
